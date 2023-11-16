@@ -6,6 +6,7 @@
 // Поместить несколько сообщений различных типов в очередь.
 
 typedef struct msqid_ds MessageQueue;
+
 typedef struct {
     long type;
     char data[32];
@@ -13,7 +14,10 @@ typedef struct {
 
 int main() {
     int identifier;
-    if (identifier = msgget(IPC_PRIVATE, 0666 | IPC_CREAT | IPC_EXCL) == -1) perror("Cannot create new identifier");
+    //IPC_PRIVATE - every time new resource and identifier
+    //IPC_EXCL - to take care if identifier already exists
+    if ((identifier = msgget(IPC_PRIVATE, 0666 | IPC_CREAT | IPC_EXCL)) == -1) perror("Cannot create new identifier");
+    else printf("New identifier is %d\n", identifier);
 
     MessageQueue queue;
     if (msgctl(identifier, IPC_STAT, &queue) == -1) perror("Cannot read statistics of message queue");
