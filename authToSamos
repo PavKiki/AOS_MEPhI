@@ -1,0 +1,6 @@
+#!/bin/bash
+
+login=`cat .ssh/login`
+password=`cat .ssh/pass`
+
+sshpass -p $password ssh $login@samos.dozen.mephi.ru

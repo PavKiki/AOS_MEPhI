@@ -1,0 +1,256 @@
+{
+    "configurations": [
+    {
+        "name": "All tasks",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "oao.mmm",
+            "444"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+        "preLaunchTask": "Build lab1",
+        "postDebugTask": "Remove executable"
+    },
+    {
+        "name": "Task7/regularFile",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "empty.txt"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+    },
+    {
+        "name": "Task7/directory",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "empty"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+    },
+    {
+        "name": "Task7/block",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "block"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+    },
+    {
+        "name": "Task7/symbol",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "symbol"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+    },
+    {
+        "name": "Task7/symbol",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "symbol"
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+    },
+    {
+        "name": "Task8 w/arguments\\Task9\\Task10",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "task8/from.txt",
+            "task8/to.txt",
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+        "preLaunchTask": "Build lab1",
+        "postDebugTask": "Remove executable"
+    },
+    {
+        "name": "Task8 no arguments",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+        "preLaunchTask": "Build lab1",
+        "postDebugTask": "Remove executable"
+    },
+    {
+        "name": "Task11",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/lab1",
+        "args": [
+            "task11/1.txt",
+            "task11/2.txt",
+            "task11/3.txt",
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/resources",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+        "preLaunchTask": "Build lab1",
+        "postDebugTask": "Remove executable"
+    },
+    ],
+    "compounds": [
+        {
+            "name": "Task 7",
+            "configurations": ["Task7/regularFile", "Task7/directory", "Task7/block", "Task7/symbol"],
+            "preLaunchTask": "Build lab1",
+            "stopAll": true,
+        },
+    ]
+}
