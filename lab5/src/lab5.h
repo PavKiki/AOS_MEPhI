@@ -11,5 +11,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 #endif

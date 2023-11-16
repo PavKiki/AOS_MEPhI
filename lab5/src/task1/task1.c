@@ -1,61 +1,40 @@
 #include "task1.h"
 
+// 1. 
+// Создать очередь сообщений или получить доступ к уже существующей очереди. 
+// Вывести на экран статистическую информацию об очереди сообщений. 
+// Поместить несколько сообщений различных типов в очередь.
+
+typedef struct msqid_ds MessageQueue;
+typedef struct {
+    long type;
+    char data[32];
+} Message;
+
 int main() {
-    int channel1[2];
-    int channel2[2];
-    //0 - read, 1 - write
-    if (pipe(channel1) < 0) perror("");
-    if (pipe(channel2) < 0) perror("");
+    int identifier;
+    if (identifier = msgget(IPC_PRIVATE, 0666 | IPC_CREAT | IPC_EXCL) == -1) perror("Cannot create new identifier");
 
-    int isDuplex;
-    printf("Do you want to create duplex connection? (0 - no, 1 - yes)\n> ");
-    scanf("%d", &isDuplex);
+    MessageQueue queue;
+    if (msgctl(identifier, IPC_STAT, &queue) == -1) perror("Cannot read statistics of message queue");
+    printf("Key: %d\n", queue.msg_perm.__key);
+    printf("UID: %d\n", queue.msg_perm.uid);
+    printf("GID: %d\n", queue.msg_perm.gid);
+    printf("MODE(decimal): %d\n", queue.msg_perm.mode);
+    printf("Creation time: %d\n", queue.msg_ctime);
+    printf("Last recieve time: %d\n", queue.msg_rtime);
+    printf("Last send time: %d\n", queue.msg_stime);
+    printf("Last recieve PID: %d\n", queue.msg_lrpid);
+    printf("Last sent PID: %d\n", queue.msg_lspid);
+    printf("Amount of messages: %d\n", queue.msg_qnum);
+    printf("Size of queue in bytes: %d\n", queue.msg_qbytes);
 
-    char letter;
+    for (size_t i = 1; i <= 10; i++) {
+        Message msg;
+        msg.type = i;
+        sprintf(msg.data, "Hello from type %d!", i);
 
-    int childPid = fork();
-    switch (childPid) {
-        case -1: {
-            perror("Error on fork occured!");
-            break;
-        }
-        case 0: {
-            //child
-            close(channel1[0]);
-            
-            write(channel1[1], "A", 1);
-            
-            if (isDuplex) {
-                close(channel2[1]);
-
-                sleep(2);
-                read(channel2[0], &letter, 1);
-                printf("%c\n", letter);
-            }
-            
-            close(channel1[1]);
-            close(channel2[0]);
-            break;
-        }
-        default: {
-            //parent
-            close(channel1[1]);
-            
-            sleep(1);
-            read(channel1[0], &letter, 1);
-            printf("%c\n", letter);
-            
-            if (isDuplex) {
-                close(channel2[0]);
-                
-                write(channel2[1], "B", 1);
-            }
-            
-            close(channel1[0]);
-            close(channel2[1]);
-
-            wait(NULL);
-            break;
-        }
+        //IPC_NOWAIT is set, so on running out of buffer msgsnd will be blocked
+        if (msgsnd(identifier, &msg, sizeof(msg.data), IPC_NOWAIT) == -1) perror("Error on sending message to the queue");
     }
 }
