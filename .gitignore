@@ -1,4 +1,5 @@
 doneLabs/
-.ssh/
-*lock*
+ssh/
 out/
+
+*lock*
