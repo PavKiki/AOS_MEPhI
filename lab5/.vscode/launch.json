@@ -27,7 +27,7 @@
             "preLaunchTask": "Build task 1"
         },
         {
-            "name": "Task 2",
+            "name": "Task 2, 3",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/lab5",
@@ -52,7 +52,35 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build task 2"
+            "preLaunchTask": "Build task 2, 3"
+        },
+        {
+            "name": "Task 4",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/lab5",
+            "args": [
+                "5",
+                "5"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build task 4"
         }
     ]
 }

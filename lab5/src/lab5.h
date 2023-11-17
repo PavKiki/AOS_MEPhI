@@ -22,6 +22,11 @@ typedef struct {
     char data[32];
 } Message;
 
+typedef struct {
+    long type;
+    char data[2];
+} ShortMessage;
+
 void printMessageQueueInfo(int identifier) {
     MessageQueue queue;
     if (msgctl(identifier, IPC_STAT, &queue) == -1) perror("Cannot read statistics of message queue");
