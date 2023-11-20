@@ -5,8 +5,7 @@
 
 void serverProcess();
 int getServerIdentifier();
-int getClientIdentifierFromMessage(char* messageData);
-char* getMessageFromClient(char* messageData);
+char* getClientStringIdentifierFromMessage(Message* msg);
 int sendResponse(int clientIdentifier, char* message);
 
 void clientProcess();

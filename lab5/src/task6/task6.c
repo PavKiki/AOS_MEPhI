@@ -32,16 +32,16 @@ void clientProcess() {
         return;
     }
 
-    int counter;
+    int counter = 0;
     while(1) {
         sleep(1);
 
-        if (sendRequestToServer(counter, serverIdentifier, clientIdentifier) == -1) {
+        if (sendRequestToServer(counter++, serverIdentifier, clientIdentifier) == -1) {
             printf("Something went wrong on sending request to the server\n");
         }
 
         if (readResponseFromServer(clientIdentifier) == -1) {
-            printf("Something went wrong on recieving response\n");
+            continue;
         }
     }
 }
@@ -49,12 +49,14 @@ void clientProcess() {
 int sendRequestToServer(int counter, int serverIdentifier, int clientIdentifier) {
     Message msg;
     msg.type = 1;
-    char tmpBuf[3];
-    sprintf(tmpBuf, "%d", clientIdentifier);
+    char tmpBuf[64];
+    sprintf(tmpBuf, "%d_", clientIdentifier);
     strcat(msg.data, tmpBuf);
-    strcat(msg.data, "Hello from client #");
-    sprintf(tmpBuf, "%3d", counter);
-    strcat(msg.data, tmpBuf);
+    strcat(msg.data, "Hello from client ");
+
+    char newTmpBuf[64];
+    sprintf(newTmpBuf, "#%d", counter);
+    strcat(msg.data, newTmpBuf);
     if (msgsnd(serverIdentifier, &msg, sizeof(msg.data), IPC_NOWAIT) == -1) {
         return -1;
     }
@@ -65,6 +67,7 @@ int sendRequestToServer(int counter, int serverIdentifier, int clientIdentifier)
 int readResponseFromServer(int clientIdentifier) {
     Message msg;
     if (msgrcv(clientIdentifier, &msg, sizeof(msg.data), 2, IPC_NOWAIT) == -1) {
+        perror("Error on reading response ");
         return -1;
     }
 
@@ -87,26 +90,22 @@ void serverProcess() {
     }
     
     while(1) {
-        //clean queue
-        // Message msg;
-        // int bytesRead = msgrcv(identifier, &msg, sizeof(msg.data), 1, MSG_NOERROR | IPC_NOWAIT);
-
         sleep(1);
 
         Message msg;
         int bytesRead = msgrcv(identifier, &msg, sizeof(msg.data), 1, MSG_NOERROR | IPC_NOWAIT);
         if (bytesRead == -1) {
-            printf("Error on receiving message\n");
+            perror("Error on receiving message");
             continue;
         } else 
         if (bytesRead <= 3) {
             printf("Cannot read client identifier\n");
             continue;
         } else {
-            int clientIdentifier = getClientIdentifierFromMessage(msg.data);
-            char *clientMessage = getMessageFromClient(msg.data);
+            char* stringClientIdentifier = getClientStringIdentifierFromMessage(&msg);
+            int clientIdentifier = atoi(stringClientIdentifier);
 
-            sendResponse(clientIdentifier, strcat("It is an answer on ", clientMessage));
+            sendResponse(clientIdentifier, msg.data);
         }
     }
 }
@@ -132,21 +131,11 @@ int sendResponse(int clientIdentifier, char* message) {
     }
 }
 
-int getClientIdentifierFromMessage(char* messageData) {
-    char stringClientId[3];
-    for (int i = 0; i < 3; i++) {
-        stringClientId[i] = messageData[i];
+char* getClientStringIdentifierFromMessage(Message* msg) {
+    char* stringClientId = calloc(64, sizeof(char));
+    for (char* ptr = msg->data, i = 0; ptr != NULL && *ptr != '_'; ptr += 1, i++) {
+        stringClientId[i] = (msg->data)[i];
     }
 
-    return atoi(stringClientId);
-}
-
-char* getMessageFromClient(char* messageData) {
-    int messageSize = sizeof(messageData) - 3;
-    char* clientMessage = calloc(messageSize, sizeof(char));
-    for (int i = 0; i < messageSize; i++) {
-        clientMessage[i] = messageData[i + 3];
-    }
-
-    return clientMessage;
+    return stringClientId;    
 }
