@@ -29,9 +29,13 @@ int main(int argc, char* argv[]) {
             int readDescriptor = open(file, O_RDONLY);
             perror("readDescriptor");
 
-            fcntl(readDescriptor, F_SETLK, &rlock);
+            struct flock tmpLock;
+            do {
+                fcntl(readDescriptor, F_GETLK, &tmpLock);
+                sleep(0.5);
+            } while(tmpLock.l_type == F_UNLCK);
             while(read(readDescriptor, &letter, 1) > 0) printf("%c\n", letter);
-            fcntl(readDescriptor, F_SETLK, &unlock);
+            // fcntl(readDescriptor, F_SETLK, &unlock);
 
             close(readDescriptor);
             break;
@@ -42,7 +46,7 @@ int main(int argc, char* argv[]) {
             perror("writeDescriptor");
             
             fcntl(writeDescriptor, F_SETLK, &wlock);
-            for (int i = 0; i < 100; i++) write(writeDescriptor, "A", 1);
+            for (int i = 0; i < 1000000; i++) write(writeDescriptor, "A", 1);
             fcntl(writeDescriptor, F_SETLK, &unlock);
 
             close(writeDescriptor);

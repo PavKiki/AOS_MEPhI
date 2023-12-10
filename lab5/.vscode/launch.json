@@ -32,7 +32,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/out/lab5",
             "args": [
-                "4",
+                "0",
                 "5"
             ],
             "stopAtEntry": false,
@@ -60,7 +60,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/out/lab5",
             "args": [
-                "5",
+                "1",
                 "5"
             ],
             "stopAtEntry": false,
@@ -88,7 +88,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/out/lab5",
             "args": [
-                "0"
+                "1"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

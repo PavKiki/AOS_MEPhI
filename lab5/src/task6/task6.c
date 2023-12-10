@@ -57,7 +57,7 @@ int sendRequestToServer(int counter, int serverIdentifier, int clientIdentifier)
     char newTmpBuf[64];
     sprintf(newTmpBuf, "#%d", counter);
     strcat(msg.data, newTmpBuf);
-    if (msgsnd(serverIdentifier, &msg, sizeof(msg.data), IPC_NOWAIT) == -1) {
+    if (msgsnd(serverIdentifier, &msg, sizeof(msg.data), 0) == -1) {
         return -1;
     }
 
@@ -66,7 +66,7 @@ int sendRequestToServer(int counter, int serverIdentifier, int clientIdentifier)
 
 int readResponseFromServer(int clientIdentifier) {
     Message msg;
-    if (msgrcv(clientIdentifier, &msg, sizeof(msg.data), 2, IPC_NOWAIT) == -1) {
+    if (msgrcv(clientIdentifier, &msg, sizeof(msg.data), 2, 0) == -1) {
         perror("Error on reading response ");
         return -1;
     }
@@ -93,7 +93,7 @@ void serverProcess() {
         sleep(1);
 
         Message msg;
-        int bytesRead = msgrcv(identifier, &msg, sizeof(msg.data), 1, MSG_NOERROR | IPC_NOWAIT);
+        int bytesRead = msgrcv(identifier, &msg, sizeof(msg.data), 1, MSG_NOERROR | 0);
         if (bytesRead == -1) {
             perror("Error on receiving message");
             continue;
