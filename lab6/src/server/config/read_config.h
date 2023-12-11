@@ -3,6 +3,6 @@
 
 #include "../../../lab6.h"
 
-int readFromConfig(char* filename, char* loggingFilename, int* port);
+int parseConfig(char* filename, char* loggingFilename, int* port);
 
 #endif

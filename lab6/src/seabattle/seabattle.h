@@ -4,9 +4,6 @@
 #include "../../lab6.h"
 #include "random/random_int.h"
 
-#define FIELD_SIZE 10
-#define SHOT 2
-#define NEW_BATTLE 3
 #define COMMAND_LENGTH 256
 #define ARGUMENTS_LENGTH 256
 #define SHOT_COMMAND_LENGTH 5

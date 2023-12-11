@@ -1,6 +1,6 @@
 #include "read_config.h"
 
-int readFromConfig(char* filename, char* loggingFilename, int* port) {
+int parseConfig(char* filename, char* loggingFilename, int* port) {
     FILE* fd;
     if ((fd = fopen(filename, "r")) == NULL) {
         fprintf(stderr, "Cannot open the file %s\n", filename);

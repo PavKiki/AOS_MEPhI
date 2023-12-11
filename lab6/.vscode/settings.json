@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "lab6.h": "c"
+        "lab6.h": "c",
+        "read_config.h": "c"
     }
 }
