@@ -61,7 +61,7 @@ void generateNewField(int field[FIELD_SIZE][FIELD_SIZE]) {
 
             //Probability 50%
             int randomNumber = getRandomInt(); 
-            if ((randomNumber % 10) < 5) {
+            if ((randomNumber % 10) < PROBABILITY_OF_GENERATING_SHIP) {
                 field[i][j] = 1;
             } else {
                 field[i][j] = 0;
@@ -145,8 +145,12 @@ void printCombinedField(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][
     printf("\n");
 }
 
-void shot(int mask[FIELD_SIZE][FIELD_SIZE], int x, int y) {
-    mask[x][y] = 1;
+void shot(MainData *data, int x, int y) {
+    (data->mask)[x][y] = 1;
+
+    if (!(data->mask[x][y] & data->field[x][y])) {
+        data->missesLeft--;
+    } 
 }
 
 //if "battle" command, argument is written in the first
@@ -189,4 +193,18 @@ int decypherGameLevel(char arguments[ARGUMENTS_LENGTH], int *quantity) {
         return 1;
     }
     return NEW_BATTLE;
+}
+
+int checkIfWin(MainData *data) {
+    for (int i = 0; i < FIELD_SIZE; i++) {
+        for (int j = 0; j < FIELD_SIZE; j++) {
+            if (data->field[i][j] && data->mask[i][j]) {
+                continue;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
 }

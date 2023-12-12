@@ -3,6 +3,7 @@
 
 #include "../../lab6.h"
 #include "config/read_config.h"
+#include "../seabattle/seabattle.h"
 
 int main(int argc, char **argv);
 
@@ -27,5 +28,10 @@ void initializeSemaphore(int semaphoreId);
 void deleteSemaphore(int semaphoreId);
 
 int awaitForClientSocket(int serverSocket);
+
+void startGame(int *gameStartedFlag, MainData *data);
+
+void clearData(MainData* data);
+void clearMessage(char message[MESSAGE_LENGTH]);
 
 #endif

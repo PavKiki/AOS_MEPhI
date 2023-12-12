@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 
     createAndConfigureSocket(&serverSocket, port);
 
-    becomeDaemon(logFilename);
+    // becomeDaemon(logFilename);
 
     createSharedMemory(&sharedMemoryId);
     connectSharedMemory(&sharedMemoryPointer, sharedMemoryId);
@@ -38,7 +38,51 @@ int main(int argc, char** argv) {
     initializeSemaphore(semaphoreId);
 
     //core
-    clientSocket = awaitForClientSocket(serverSocket);
+    {
+        printf("Waiting for connection\n");
+        clientSocket = awaitForClientSocket(serverSocket);
+        
+        int gameStartedFlag = 0;
+        int overallMisses;
+        MainData data;
+        while (1) {
+            char buffer[256];
+            int x = 0;
+            int y = 0;
+            Command command;
+
+            clearMessage(data.message);
+            read(clientSocket, &command, sizeof(command));
+            switch (decypherCommand(command.body, command.arguments, &x, &y)) {
+                case SHOT:
+                    if (!gameStartedFlag) {
+                        strcpy(data.message, "Field is not generated yet!\n"); 
+                        break;
+                    }
+
+                    shot(&data, x, y);
+
+                    if (   data.missesLeft <= 0
+                        || checkIfWin(&data)) {
+                        strcpy(data.message, "It is the end of the game! To start new game enter \"battle {x}\"\n");
+                        gameStartedFlag = 0;
+                        break;
+                    }
+                    break;
+                
+                case NEW_BATTLE:
+                    startGame(&gameStartedFlag, &data);
+                    data.missesLeft = x;
+                    break;
+
+                default:
+                    fprintf(stderr, "Unknown command\n");
+                    break;
+            }
+
+            write(clientSocket, &data, sizeof(MainData));
+        }
+    }
 
     const char *battleStarted = "SEABATTLE STARTED!";
     write(clientSocket, battleStarted, sizeof(battleStarted));
@@ -184,19 +228,15 @@ void deleteSharedMemory(int sharedMemoryId) {
 }
 
 void initializeSharedMemory(MainData* sharedMemoryPointer) {
-    sharedMemoryPointer->misses = 0;
+    clearData(sharedMemoryPointer);
+}
 
-    for (int i = 0; i < FIELD_SIZE; i++) {
-        for (int j = 0; j < FIELD_SIZE; j++) {
-            (sharedMemoryPointer->field)[i][j] = 0;
-        }
-    }
+void clearData(MainData* data) {
+    clearMessage(data->message);
+    clearField(data->mask);
+    clearField(data->field);
 
-    for (int i = 0; i < FIELD_SIZE; i++) {
-        for (int j = 0; j < FIELD_SIZE; j++) {
-            (sharedMemoryPointer->mask)[i][j] = 0;
-        }
-    }
+    data->missesLeft = 0;
 }
 
 void createSemaphore(int *semaphoreId) {
@@ -243,6 +283,20 @@ int awaitForClientSocket(int serverSocket) {
     }
 
     return clientSocket;
+}
+
+void startGame(int *gameStartedFlag, MainData *data) {
+    clearData(data);
+
+    strcpy(data->message, "The game was started!\n");
+    generateNewField(data->field);
+    *gameStartedFlag = 1;
+}
+
+void clearMessage(char message[MESSAGE_LENGTH]) {
+    for (int i = 0; i < MESSAGE_LENGTH; i++) {
+        message[i] = '\0';
+    }
 }
 
 // void createWorkerProcess() {

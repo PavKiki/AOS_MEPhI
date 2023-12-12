@@ -14,18 +14,23 @@ int main(int argc, char** argv) {
     while (1) {
         printf("\nEnter the command:\n>> ");
         
-        char buffer[256];
-        scanf("%s", buffer);
-        write(clientSocket, buffer, sizeof(buffer));
+        char body[COMMAND_LENGTH] = { 0 };
+        char arguments[ARGUMENTS_LENGTH] = { 0 };
+        scanf("%s\t%s", body, arguments);
+        
+        Command command;
+        strcpy(command.body, body);
+        strcpy(command.arguments, arguments);
+
+        write(clientSocket, &command, sizeof(command));
     
         sleep(0.5);
 
         MainData currentData;
-        sizeof(currentData);
-        read(clientSocket, &currentData, sizeof(int));
+        read(clientSocket, &currentData, sizeof(currentData));
         if (strcmp(currentData.message, "") == 0) {
             printCombinedField(currentData.field, currentData.mask);
-            printf("Misses left: %d\n\n", currentData.misses);
+            printf("Misses left: %d\n\n", currentData.missesLeft);
         } else {
             printf("%s", currentData.message);
         }

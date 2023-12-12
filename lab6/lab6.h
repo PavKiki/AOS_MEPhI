@@ -25,6 +25,8 @@
 
 #define MESSAGE_LENGTH 256
 
+#define PROBABILITY_OF_GENERATING_SHIP 5 //0 to 10
+
 #define FIELD_SIZE 10
 #define SHOT 2
 #define NEW_BATTLE 3
@@ -34,7 +36,7 @@ typedef struct sockaddr_in InternetSocketAddress;
 
 typedef struct {
     char message[256];
-    int misses;
+    int missesLeft;
     int field[FIELD_SIZE][FIELD_SIZE];
     int mask[FIELD_SIZE][FIELD_SIZE];
 } MainData;
