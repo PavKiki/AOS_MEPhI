@@ -1,43 +1,43 @@
 #include "seabattle.h"
 
-//just for tests
-int main() {
-    int field[FIELD_SIZE][FIELD_SIZE] = { 0 };
-    int mask[FIELD_SIZE][FIELD_SIZE] = { 0 };
+// //just for tests
+// int main() {
+//     int field[FIELD_SIZE][FIELD_SIZE] = { 0 };
+//     int mask[FIELD_SIZE][FIELD_SIZE] = { 0 };
     
-    generateNewField(field);
+//     generateNewField(field);
     
-    int x, y;
-    while (1) {
-        printPlacement(field);
-        printShots(mask);
-        printCombined(field, mask);
+//     int x, y;
+//     while (1) {
+//         printPlacement(field);
+//         printShots(mask);
+//         printCombined(field, mask);
 
-        x = 0;
-        y = 0;
-        char command[COMMAND_LENGTH] = { 0 };
-        char arguments[ARGUMENTS_LENGTH] = { 0 };
-        printf("Please enter a command:\n");
-        scanf("%s\t%s", command, arguments);
+//         x = 0;
+//         y = 0;
+//         char command[COMMAND_LENGTH] = { 0 };
+//         char arguments[ARGUMENTS_LENGTH] = { 0 };
+//         printf("Please enter a command:\n");
+//         scanf("%s\t%s", command, arguments);
 
-        switch (decypherCommand(command, arguments, &x, &y))
-        {
-        case SHOT:
-            shot(mask, x, y);
-            break;
+//         switch (decypherCommand(command, arguments, &x, &y))
+//         {
+//         case SHOT:
+//             shot(mask, x, y);
+//             break;
         
-        case NEW_BATTLE:
-            clearField(mask);
-            clearField(field);
-            generateNewField(field);
-            break;
+//         case NEW_BATTLE:
+//             clearField(mask);
+//             clearField(field);
+//             generateNewField(field);
+//             break;
 
-        default:
-            fprintf(stderr, "main seabattle\n");
-            break;
-        }
-    }
-}
+//         default:
+//             fprintf(stderr, "main seabattle\n");
+//             break;
+//         }
+//     }
+// }
 
 //There will be two arrays:
 // 1. Which is stands for ship placement
@@ -127,7 +127,7 @@ void printShots(int mask[FIELD_SIZE][FIELD_SIZE]) {
     printf("\n");
 }
 
-void printCombined(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][FIELD_SIZE]) {
+void printCombinedField(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][FIELD_SIZE]) {
     printf("Battle field:\n");
     printf(" 0 1 2 3 4 5 6 7 8 9 \n");
     for (int i = 0; i < FIELD_SIZE; i++) {

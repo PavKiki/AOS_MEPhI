@@ -19,9 +19,11 @@
 #include <time.h>
 #include <math.h>
 
-#define MAX_CLIENT_SOCKETS 10
+#define MAX_CLIENTS 10
 
 #define MAX_PENDING_CONNECTIONS 10
+
+#define MESSAGE_LENGTH 256
 
 #define FIELD_SIZE 10
 #define SHOT 2
@@ -31,9 +33,8 @@ typedef struct sockaddr AbstractSocketAddress;
 typedef struct sockaddr_in InternetSocketAddress;
 
 typedef struct {
-    int clients;
-    int plainField[FIELD_SIZE * FIELD_SIZE];
-    int plainMask[FIELD_SIZE * FIELD_SIZE];
+    char message[256];
+    int misses;
     int field[FIELD_SIZE][FIELD_SIZE];
     int mask[FIELD_SIZE][FIELD_SIZE];
 } MainData;

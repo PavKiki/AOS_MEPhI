@@ -9,6 +9,8 @@
 				"-g",
 				"src/server/server.c",
 				"src/server/config/read_config.c",
+				"src/seabattle/seabattle.c",
+				"src/seabattle/random/random_int.c",
 				"-o",
 				"out/server"
 			],
@@ -32,6 +34,8 @@
 				"-fdiagnostics-color=always",
 				"-g",
 				"src/client/client.c",
+				"src/seabattle/seabattle.c",
+				"src/seabattle/random/random_int.c",
 				"-o",
 				"out/client"
 			],

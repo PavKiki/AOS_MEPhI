@@ -4,7 +4,7 @@
 #include "../../lab6.h"
 #include "config/read_config.h"
 
-int main(int argc, char** argv);
+int main(int argc, char **argv);
 
 void configureSignalProcessing();
 void customSignalHandler(int signum);
@@ -12,15 +12,20 @@ void processSIGTERM();
 void processSIGHUP();
 void processSIGINT();
 
-int createAndConfigureSocket(int *serverSocket, int port);
+void createAndConfigureSocket(int *serverSocket, int port);
 
-int becomeDaemon(char* logFilename);
+void becomeDaemon(char *logFilename);
 
-int createSharedMemory(int *sharedMemoryId);
-int connectSharedMemory(int sharedMemoryId);
+void createSharedMemory(int *sharedMemoryId);
+void connectSharedMemory(MainData **sharedMemoryPointer, int sharedMemoryId);
 void initializeSharedMemory(MainData* sharedMemoryPointer);
+void turnOffSharedMemory(MainData *sharedMemoryPointer);
+void deleteSharedMemory(int sharedMemoryId);
 
-int createSemaphore(int *semaphoreId);
-int initializeSemaphore(int semaphoreId);
+void createSemaphore(int *semaphoreId);
+void initializeSemaphore(int semaphoreId);
+void deleteSemaphore(int semaphoreId);
+
+int awaitForClientSocket(int serverSocket);
 
 #endif

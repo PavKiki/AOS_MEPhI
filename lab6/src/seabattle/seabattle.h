@@ -9,13 +9,13 @@
 #define SHOT_COMMAND_LENGTH 5
 #define BATTLE_COMMAND_LENGTH 7
 
-int main();
+// int main();
 void generateNewField();
 int checkIfCellAvailable(int field[FIELD_SIZE][FIELD_SIZE], int x, int y);
 int checkIfNotExistOrEmpty(int field[FIELD_SIZE][FIELD_SIZE], int x, int y);
 void printPlacement(int field[FIELD_SIZE][FIELD_SIZE]);
 void printShots(int mask[FIELD_SIZE][FIELD_SIZE]);
-void printCombined(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][FIELD_SIZE]);
+void printCombinedField(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][FIELD_SIZE]);
 int decypherCommand(char command[COMMAND_LENGTH], char arguments[ARGUMENTS_LENGTH], int *first, int *second);
 int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y);
 int decypherGameLevel(char arguments[ARGUMENTS_LENGTH], int *quantity);
