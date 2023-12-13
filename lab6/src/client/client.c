@@ -17,7 +17,8 @@ int main(int argc, char** argv) {
         char body[COMMAND_LENGTH] = { 0 };
         char arguments[ARGUMENTS_LENGTH] = { 0 };
 
-        //normal input
+        //TODO logs with time
+        //TODO normal input
         scanf("%s\t%s", body, arguments);
         
         Command command;
