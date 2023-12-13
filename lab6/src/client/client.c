@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv) {
     if (argc != 3) {
-        write(stderr, "Incorrect arguments input! It should be ./%s hostname port");
+        write(STDERR_FILENO, "Incorrect arguments input! It should be ./client hostname port", 63);
         exit(1);
     }
 
