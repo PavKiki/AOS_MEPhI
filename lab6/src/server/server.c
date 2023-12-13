@@ -10,6 +10,10 @@ int clientSocket;
 
 int sharedMemoryId;
 
+int semaphoreId;
+
+int messageQueueId;
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Incorrect arguments input! It should be ./%s configurationsFilename\n");
@@ -18,7 +22,6 @@ int main(int argc, char** argv) {
 
     MainData* sharedMemoryPointer;
 
-    int semaphoreId;
 
     //====================================================
 
@@ -38,6 +41,8 @@ int main(int argc, char** argv) {
     createSemaphore(&semaphoreId);
     initializeSemaphore(semaphoreId);
 
+    createMessageQueue(&messageQueueId);
+
     //core
     {
         printf("Waiting for connection\n");
@@ -55,28 +60,32 @@ int main(int argc, char** argv) {
             clearMessage(data.message);
             read(clientSocket, &command, sizeof(command));
             switch (decypherCommand(command.body, command.arguments, &x, &y)) {
-                case SHOT:
-                    if (!gameStartedFlag) {
+                case SHOT: {
+                        if (!gameStartedFlag) {
                         strcpy(data.message, "Field is not generated yet!\n"); 
                         break;
                     }
 
-                    shot(&data, x, y);
+                    makeShot(&data, x, y);
 
                     if (   data.missesLeft <= 0
                         || checkIfWin(&data)) {
+
                         strcpy(data.message, "It is the end of the game! To start new game enter \"battle {x}\"\n");
                         gameStartedFlag = 0;
                         break;
                     }
+
                     break;
-                
+                }
+
                 case NEW_BATTLE:
                     startGame(&gameStartedFlag, &data, clientSocket);
                     data.missesLeft = x;
                     break;
 
                 default:
+                    strcpy(data.message, "Unknown command\n");
                     fprintf(stderr, "Unknown command\n");
                     break;
             }
@@ -91,6 +100,8 @@ int main(int argc, char** argv) {
     turnOffSharedMemory(sharedMemoryPointer);
 
     deleteSemaphore(semaphoreId);
+
+    deleteMessageQueue(messageQueueId);
 }
 
 void configureSignalProcessing() {
@@ -112,8 +123,12 @@ void customSignalHandler(int signum) {
 
 //Terminate and send result to client
 void processSIGTERM() {
+    //TODO
+
     close(clientSocket);
+    
     printf("\nSIGTERM has been called\n");
+    exit(0);
 }
 
 //Re-read config file
@@ -138,10 +153,11 @@ void processSIGHUP() {
 void processSIGINT() {
     if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
         perror("shmctl");
-        return 1;
+        exit(1);
     }
 
     printf("\nSIGINT has been called\n");
+    exit(0);
 }
 
 void createAndConfigureSocket(int *serverSocket, int port) {
@@ -256,9 +272,59 @@ void initializeSemaphore(int semaphoreId) {
     }
 }
 
+void captureSemaphore(int semaphoreId) {
+    struct sembuf op = {0, -1, 0};
+    if (semop(semaphoreId, &op, 1) == -1) {
+        perror("Error on capture semaphore");
+        exit(1);
+    }
+}
+
+void freeSemaphore(int semaphore) {
+    struct sembuf op = {0, 1, 0};
+    if (semop(semaphoreId, &op, 1) == -1) {
+        perror("Error on free semaphore");
+        exit(1);
+    }
+}
+
 void deleteSemaphore(int semaphoreId) {
     if (semctl(semaphoreId, 0, IPC_RMID) == -1) {
         perror("Error on deleting semaphore");
+        exit(1);
+    }
+}
+
+void createMessageQueue(int *messageQueueId) {
+    *messageQueueId = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
+    if (*messageQueueId == -1) {
+        perror("Error on creating message queue");
+        exit(1);
+    }
+}
+
+void sendMessage(int x, int y, int misses, int type) {
+    Message msg;
+    msg.type = type;
+    msg.info.x = x;
+    msg.info.y = y;
+    msg.info.misses = misses;
+    if (msgsnd(messageQueueId, &msg, sizeof(CoordinatesAndMisses), 0) == -1) {
+        perror("Error on sending a message\n");
+        exit(1);
+    }
+}
+
+void recieveMessage(Message *msg, int type) {
+    if (msgrcv(messageQueueId, msg, sizeof(CoordinatesAndMisses), type, 0) == -1) {
+        perror("Error on recieving a message\n");
+        exit(1);
+    }
+}
+
+void deleteMessageQueue(int messageQueueId) {
+    if (msgctl(messageQueueId, IPC_RMID, NULL) == -1) {
+        perror("Error on deleting message queue");
         exit(1);
     }
 }
@@ -286,19 +352,81 @@ void startGame(int *gameStartedFlag, MainData *data, int clientSocket) {
     *gameStartedFlag = 1;
 }
 
+void makeShot(MainData *data, int x, int y) {
+    sendMessage(x, y, data->missesLeft, TO_PROCESSING);
+
+    createWorkerToProcessShot(data);
+
+    Message recievedMessage;
+    recieveMessage(&recievedMessage, FROM_PROCESSING);
+
+    (data->mask)[x][y] = 1;
+    data->missesLeft = recievedMessage.info.misses;
+}
+
 void createWorkerToGenerateField(MainData *data, int clientSocket) {
     pid_t childPid = fork();
     
     if (childPid) {
     //master process
-        wait(NULL);
+        waitpid(childPid, NULL, 0);
+
+        captureSemaphore(semaphoreId);
+        
+        MainData* ptr;
+        connectSharedMemory(&ptr, sharedMemoryId);
+        for (int i = 0; i < FIELD_SIZE; i++) {
+            for (int j = 0; j < FIELD_SIZE; j++) {
+                data->field[i][j] = ptr->field[i][j];
+            }
+        }
+
+        freeSemaphore(semaphoreId);
     } else {
     //worker process
-        generateNewField(data->field);
+        int newField[FIELD_SIZE][FIELD_SIZE];
+        generateNewField(newField);
 
-        // close(clientSocket);
+        captureSemaphore(semaphoreId);
+        
+        MainData* ptr;
+        connectSharedMemory(&ptr, sharedMemoryId);
+        for (int i = 0; i < FIELD_SIZE; i++) {
+            for (int j = 0; j < FIELD_SIZE; j++) {
+                ptr->field[i][j] = newField[i][j];
+            }
+        }
+
+        freeSemaphore(semaphoreId);
+
+        close(clientSocket);
+        close(serverSocket);
+        exit(0);
     }
+}
 
+void createWorkerToProcessShot(MainData *data) {
+    pid_t childPid = fork();
+    if (childPid) {
+    //master process
+        waitpid(childPid, NULL, 0);
+    } else {
+    //worker process
+        Message recievedMsg;
+        recieveMessage(&recievedMsg, TO_PROCESSING);
+
+        Message msgToSend;
+        int newMisses = recievedMsg.info.misses;
+        if (!checkHit(data, recievedMsg.info.x, recievedMsg.info.y)) {
+            newMisses--;
+        }
+
+        sendMessage(recievedMsg.info.x, recievedMsg.info.y, newMisses, FROM_PROCESSING);
+
+        close(serverSocket);
+        close(clientSocket);
+        exit(0);
+    }
 }
 
 void clearMessage(char message[MESSAGE_LENGTH]) {
@@ -306,15 +434,3 @@ void clearMessage(char message[MESSAGE_LENGTH]) {
         message[i] = '\0';
     }
 }
-
-// void createWorkerProcess() {
-//     pid_t workerPid = fork();
-//     if (workerPid < 0) {
-//         perror("Error on fork");
-//         exit(1);
-//     } else
-//     if (workerPid == 0) {
-//         //parent process
-
-//     }
-// }

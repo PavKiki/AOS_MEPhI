@@ -14,6 +14,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <sys/msg.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
@@ -40,5 +41,16 @@ typedef struct {
     int field[FIELD_SIZE][FIELD_SIZE];
     int mask[FIELD_SIZE][FIELD_SIZE];
 } MainData;
+
+typedef struct {
+    int x;
+    int y;
+    int misses;
+} CoordinatesAndMisses;
+
+typedef struct {
+    long type;
+    CoordinatesAndMisses info;
+} Message;
 
 #endif

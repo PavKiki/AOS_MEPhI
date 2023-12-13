@@ -145,12 +145,16 @@ void printCombinedField(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][
     printf("\n");
 }
 
-void shot(MainData *data, int x, int y) {
-    (data->mask)[x][y] = 1;
+// void shot(MainData *data, int x, int y) {
+//     (data->mask)[x][y] = 1;
 
-    if (!(data->mask[x][y] & data->field[x][y])) {
-        data->missesLeft--;
-    } 
+//     if (!(data->mask[x][y] & data->field[x][y])) {
+//         data->missesLeft--;
+//     } 
+// }
+
+int checkHit(MainData *data, int x, int y) {
+    return data->mask[x][y] & data->field[x][y];
 }
 
 //if "battle" command, argument is written in the first

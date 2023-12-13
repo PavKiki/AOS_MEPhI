@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
         
         char body[COMMAND_LENGTH] = { 0 };
         char arguments[ARGUMENTS_LENGTH] = { 0 };
+
         scanf("%s\t%s", body, arguments);
         
         Command command;

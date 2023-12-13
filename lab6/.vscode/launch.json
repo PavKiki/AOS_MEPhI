@@ -35,7 +35,7 @@
             "program": "${workspaceFolder}/out/client",
             "args": [
                 "127.0.0.1",
-                "8085"
+                "1337228"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -19,7 +19,8 @@ void printCombinedField(int field[FIELD_SIZE][FIELD_SIZE], int mask[FIELD_SIZE][
 int decypherCommand(char command[COMMAND_LENGTH], char arguments[ARGUMENTS_LENGTH], int *first, int *second);
 int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y);
 int decypherGameLevel(char arguments[ARGUMENTS_LENGTH], int *quantity);
-void shot(MainData *data, int x, int y);
+// void shot(MainData *data, int x, int y);
+int checkHit(MainData *data, int x, int y);
 void clearField(int field[FIELD_SIZE][FIELD_SIZE]);
 int checkIfWin(MainData *data);
 
