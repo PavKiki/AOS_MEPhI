@@ -85,8 +85,8 @@ int main(int argc, char** argv) {
                     break;
 
                 default:
-                    strcpy(data.message, "Unknown command\n");
-                    fprintf(stderr, "Unknown command\n");
+                    strcpy(data.message, "Unknown command");
+                    fprintf(stderr, "Unknown command");
                     break;
             }
 

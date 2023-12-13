@@ -184,7 +184,7 @@ int decypherCommand(char command[COMMAND_LENGTH], char arguments[ARGUMENTS_LENGT
 } 
 
 int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y) {
-    if (sscanf(arguments, "(%d, %d)\n", x, y) != 2) {
+    if (sscanf(arguments, "(%d,%d)", x, y) != 2) {
         fprintf(stderr, "Cannot recognize coordinates\n");
         return 1;
     }
@@ -192,7 +192,7 @@ int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y) {
 }
 
 int decypherGameLevel(char arguments[ARGUMENTS_LENGTH], int *quantity) {
-    if (sscanf(arguments, "{%d}\n", quantity) != 1) {
+    if (sscanf(arguments, "{%d}", quantity) != 1) {
         fprintf(stderr, "Cannot recognize quantity\n");
         return 1;
     }
