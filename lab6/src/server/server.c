@@ -107,25 +107,31 @@ int main(int argc, char** argv) {
 void configureSignalProcessing() {
     signal(SIGTERM, customSignalHandler);
     signal(SIGHUP, customSignalHandler);
-    signal(SIGINT, customSignalHandler);
 }
 
 void customSignalHandler(int signum) {
     switch (signum) {
     case SIGTERM:
-        return processSIGTERM();
+        processSIGTERM();
     case SIGHUP:
-        return processSIGHUP();
-    case SIGINT:
-        return processSIGINT();
+        processSIGHUP();
     }
 }
 
 //Terminate and send result to client
 void processSIGTERM() {
-    //TODO
+    MainData* data = malloc(sizeof(MainData));
+    connectSharedMemory(&data, sharedMemoryId);
+
+    write(clientSocket, data, sizeof(MainData));
+
+    if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
 
     close(clientSocket);
+    close(serverSocket);
     
     printf("\nSIGTERM has been called\n");
     exit(0);
@@ -147,17 +153,6 @@ void processSIGHUP() {
     }
     
     printf("\nSIGHUP has been called\n");
-}
-
-//Terminate and delete shared memory
-void processSIGINT() {
-    if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
-        perror("shmctl");
-        exit(1);
-    }
-
-    printf("\nSIGINT has been called\n");
-    exit(0);
 }
 
 void createAndConfigureSocket(int *serverSocket, int port) {
@@ -183,7 +178,11 @@ void createAndConfigureSocket(int *serverSocket, int port) {
 
 void becomeDaemon(char* logFilename) {
     chdir("/");
-    if (fork()) exit(0);
+    if (fork()) {
+        // wait(NULL);
+        exit(0);
+    }
+
     setsid();
 
     close(STDIN_FILENO);
@@ -195,7 +194,7 @@ void becomeDaemon(char* logFilename) {
         perror("Error on open logging file");
         exit(1);
     }
-
+    
     dup2(loggingDescriptor, STDIN_FILENO);
     dup2(loggingDescriptor, STDOUT_FILENO);
     dup2(loggingDescriptor, STDERR_FILENO);
@@ -370,7 +369,6 @@ void createWorkerToGenerateField(MainData *data, int clientSocket) {
     if (childPid) {
     //master process
         waitpid(childPid, NULL, 0);
-        //TODO figure out
         captureSemaphore(semaphoreId);
         
         MainData* ptr;

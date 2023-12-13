@@ -12,9 +12,8 @@ int main(int argc, char **argv);
 
 void configureSignalProcessing();
 void customSignalHandler(int signum);
-void processSIGTERM();
 void processSIGHUP();
-void processSIGINT();
+void processSIGTERM();
 
 void createAndConfigureSocket(int *serverSocket, int port);
 

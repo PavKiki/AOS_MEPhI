@@ -13,4 +13,17 @@ int parseConfig(char* filename, char* loggingFilename, int* port) {
     }
 
     fclose(fd);
+
+    char timestamp[32];
+    time_t t = time(NULL);
+    struct tm* tm = localtime(&t);
+    if (tm == NULL) {
+        perror("Error on getting local time\n");
+        exit(1);
+    }
+    if (strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S.txt", tm) == 0) {
+        fprintf(stderr, "Error on formatting timestamp\n");
+        exit(1);
+    }
+    strcat(loggingFilename, timestamp);
 }
