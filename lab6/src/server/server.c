@@ -370,7 +370,7 @@ void createWorkerToGenerateField(MainData *data, int clientSocket) {
     if (childPid) {
     //master process
         waitpid(childPid, NULL, 0);
-
+        //TODO figure out
         captureSemaphore(semaphoreId);
         
         MainData* ptr;
