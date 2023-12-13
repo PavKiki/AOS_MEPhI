@@ -29,7 +29,9 @@ void deleteSemaphore(int semaphoreId);
 
 int awaitForClientSocket(int serverSocket);
 
-void startGame(int *gameStartedFlag, MainData *data);
+void createWorkerToGenerateField(MainData *data, int clientSocket);
+
+void startGame(int *gameStartedFlag, MainData *data, int clientSocket);
 
 void clearData(MainData* data);
 void clearMessage(char message[MESSAGE_LENGTH]);

@@ -5,16 +5,17 @@ char configFilename[256];
 
 int port;
 
+int serverSocket;
+int clientSocket;
+
+int sharedMemoryId;
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Incorrect arguments input! It should be ./%s configurationsFilename\n");
         return 1;
     }
 
-    int serverSocket;
-    int clientSocket;
-
-    int sharedMemoryId;
     MainData* sharedMemoryPointer;
 
     int semaphoreId;
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
                     break;
                 
                 case NEW_BATTLE:
-                    startGame(&gameStartedFlag, &data);
+                    startGame(&gameStartedFlag, &data, clientSocket);
                     data.missesLeft = x;
                     break;
 
@@ -109,18 +110,10 @@ void customSignalHandler(int signum) {
     }
 }
 
-//Terminate and send result to client (TODO)
+//Terminate and send result to client
 void processSIGTERM() {
-    // TODO
-    // for (int i = 0; i < 20; i++) {
-    //     if (client_socks[i] != -1) {
-    //         handle_prog(client_socks[i], server_sock, semid);
-    //         client_socks[i] = -1;
-    //         close(client_socks[i]);
-    //     }
-    // }
-
-    // printf("\nSIGTERM has been called\n");
+    close(clientSocket);
+    printf("\nSIGTERM has been called\n");
 }
 
 //Re-read config file
@@ -141,16 +134,14 @@ void processSIGHUP() {
     printf("\nSIGHUP has been called\n");
 }
 
-//Terminate and delete shared memory (TODO)
+//Terminate and delete shared memory
 void processSIGINT() {
-    // TODO
-    // if (shmctl(shmid, IPC_RMID, NULL) == -1) {
-    //     perror("shmctl");
-    //     return 1;
-    // }
+    if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        return 1;
+    }
 
-    // printf("\nSIGINT has been called\n");
-    // return 0;
+    printf("\nSIGINT has been called\n");
 }
 
 void createAndConfigureSocket(int *serverSocket, int port) {
@@ -285,12 +276,29 @@ int awaitForClientSocket(int serverSocket) {
     return clientSocket;
 }
 
-void startGame(int *gameStartedFlag, MainData *data) {
+void startGame(int *gameStartedFlag, MainData *data, int clientSocket) {
     clearData(data);
 
     strcpy(data->message, "The game was started!\n");
-    generateNewField(data->field);
+
+    createWorkerToGenerateField(data, clientSocket);
+    
     *gameStartedFlag = 1;
+}
+
+void createWorkerToGenerateField(MainData *data, int clientSocket) {
+    pid_t childPid = fork();
+    
+    if (childPid) {
+    //master process
+        wait(NULL);
+    } else {
+    //worker process
+        generateNewField(data->field);
+
+        // close(clientSocket);
+    }
+
 }
 
 void clearMessage(char message[MESSAGE_LENGTH]) {

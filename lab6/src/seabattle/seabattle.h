@@ -10,7 +10,7 @@
 #define BATTLE_COMMAND_LENGTH 7
 
 // int main();
-void generateNewField();
+void generateNewField(int field[FIELD_SIZE][FIELD_SIZE]);
 int checkIfCellAvailable(int field[FIELD_SIZE][FIELD_SIZE], int x, int y);
 int checkIfNotExistOrEmpty(int field[FIELD_SIZE][FIELD_SIZE], int x, int y);
 void printPlacement(int field[FIELD_SIZE][FIELD_SIZE]);
