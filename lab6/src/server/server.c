@@ -16,7 +16,7 @@ int messageQueueId;
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        fprintf(stderr, "Incorrect arguments input! It should be ./%s configurationsFilename\n");
+        write(STDERR_FILENO, "Incorrect arguments input! It should be ./server configurationsFilename\n", 73);
         return 1;
     }
 
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 
     //core
     {
-        printf("Waiting for connection\n");
+        write(STDIN_FILENO, "Waiting for connection\n", 24);
         clientSocket = awaitForClientSocket(serverSocket);
         
         int gameStartedFlag = 0;
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 
                 default:
                     strcpy(data.message, "Unknown command");
-                    fprintf(stderr, "Unknown command");
+                    write(STDERR_FILENO, "Unknown command", 16);
                     break;
             }
 
@@ -126,14 +126,14 @@ void processSIGTERM() {
     write(clientSocket, data, sizeof(MainData));
 
     if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
-        perror("shmctl");
+        write(STDERR_FILENO, "Error on deleting shared memory\n", 33);
         exit(1);
     }
 
     close(clientSocket);
     close(serverSocket);
     
-    printf("\nSIGTERM has been called\n");
+    write(STDOUT_FILENO, "\nSIGTERM has been called\n", 26);
     exit(0);
 }
 
@@ -143,21 +143,21 @@ void processSIGHUP() {
     sigemptyset(&mask);
     sigaddset(&mask, SIGHUP);
     if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1) {
-        perror("Error on blocking SIGHUP signal");
+        write(STDERR_FILENO, "Error on blocking SIGHUP signal", 32);
     }
 
     parseConfig(configFilename, logFilename, &port);
 
     if (sigprocmask(SIG_UNBLOCK, &mask, NULL) == -1) {
-        perror("Error on unblocking SIGHUP signal");
+        write(STDERR_FILENO, "Error on unblocking SIGHUP signal", 34);
     }
     
-    printf("\nSIGHUP has been called\n");
+    write(STDOUT_FILENO, "\nSIGHUP has been called\n", 25);
 }
 
 void createAndConfigureSocket(int *serverSocket, int port) {
     if ((*serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
-        perror("Socket establishment");
+        write(STDERR_FILENO, "Socket establishment", 21);
         exit(1);
     }
 
@@ -166,12 +166,12 @@ void createAndConfigureSocket(int *serverSocket, int port) {
     serverAddress.sin_port = htons(port);       //convert to internet port correctly
     serverAddress.sin_addr.s_addr = INADDR_ANY; //bind to all local interfaces
     if (bind(*serverSocket, (AbstractSocketAddress*) &serverAddress, (socklen_t) sizeof(serverAddress)) == -1) {
-        perror("Error on binding socket with address");
+        write(STDERR_FILENO, "Error on binding socket with address", 37);
         exit(1);
     }
 
     if (listen(*serverSocket, MAX_PENDING_CONNECTIONS) == -1) {
-        perror("Error on listening to upcoming connections");
+        write(STDERR_FILENO, "Error on listening to upcoming connections", 43);
         exit(1);
     }
 }
@@ -191,7 +191,7 @@ void becomeDaemon(char* logFilename) {
 
     int loggingDescriptor = open(logFilename, O_WRONLY | O_CREAT | O_APPEND, 0666);
     if (loggingDescriptor == -1) {
-        perror("Error on open logging file");
+        write(STDERR_FILENO, "Error on open logging file", 27);
         exit(1);
     }
     
@@ -205,7 +205,7 @@ void becomeDaemon(char* logFilename) {
 void createSharedMemory(int *sharedMemoryId) {
     *sharedMemoryId = shmget(IPC_PRIVATE, sizeof(MainData), IPC_CREAT | 0666);
     if (*sharedMemoryId == -1) {
-        perror("Error on creating shared memory id");
+        write(STDERR_FILENO, "Error on creating shared memory id", 35);
         exit(1);
     }
 }
@@ -214,21 +214,21 @@ void connectSharedMemory(MainData **sharedMemoryPointer, int sharedMemoryId) {
     //Gets random free segment
     *sharedMemoryPointer = (MainData*)shmat(sharedMemoryId, NULL, 0);
     if (*sharedMemoryPointer == (MainData*) - 1) {
-        perror("Error on connecting shared memory");
+        write(STDERR_FILENO, "Error on connecting shared memory", 34);
         exit(1);
     }
 }
 
 void turnOffSharedMemory(MainData* sharedMemoryPointer) {
     if (shmdt(sharedMemoryPointer) == -1) {
-        perror("Error on turning off shared memory");
+        write(STDERR_FILENO, "Error on turning off shared memory", 35);
         exit(1);
     }
 }
 
 void deleteSharedMemory(int sharedMemoryId) {
     if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
-        perror("Error on deleting shared memory");
+        write(STDERR_FILENO, "Error on deleting shared memory", 32);
         exit(1);
     }
 }
@@ -248,7 +248,7 @@ void clearData(MainData* data) {
 void createSemaphore(int *semaphoreId) {
     *semaphoreId = semget(IPC_PRIVATE, 1, IPC_CREAT | 0666);
     if (*semaphoreId == -1) {
-        perror("Error on creating semaphore id");
+        write(STDERR_FILENO, "Error on creating semaphore id", 31);
         exit(1);
     }
 }
@@ -266,7 +266,7 @@ void initializeSemaphore(int semaphoreId) {
     //0 - free, 1 - locked
     arg.val = 1;
     if (semctl(semaphoreId, 0, SETVAL, arg) == -1) {
-        perror("Error on initializing semaphore");
+        write(STDERR_FILENO, "Error on initializing semaphore", 32);
         exit(1);
     }
 }
@@ -274,7 +274,7 @@ void initializeSemaphore(int semaphoreId) {
 void captureSemaphore(int semaphoreId) {
     struct sembuf op = {0, -1, 0};
     if (semop(semaphoreId, &op, 1) == -1) {
-        perror("Error on capture semaphore");
+        write(STDERR_FILENO, "Error on capture semaphore", 27);
         exit(1);
     }
 }
@@ -282,14 +282,14 @@ void captureSemaphore(int semaphoreId) {
 void freeSemaphore(int semaphore) {
     struct sembuf op = {0, 1, 0};
     if (semop(semaphoreId, &op, 1) == -1) {
-        perror("Error on free semaphore");
+        write(STDERR_FILENO, "Error on free semaphore", 24);
         exit(1);
     }
 }
 
 void deleteSemaphore(int semaphoreId) {
     if (semctl(semaphoreId, 0, IPC_RMID) == -1) {
-        perror("Error on deleting semaphore");
+        write(STDERR_FILENO, "Error on deleting semaphore", 28);
         exit(1);
     }
 }
@@ -297,7 +297,7 @@ void deleteSemaphore(int semaphoreId) {
 void createMessageQueue(int *messageQueueId) {
     *messageQueueId = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
     if (*messageQueueId == -1) {
-        perror("Error on creating message queue");
+        write(STDERR_FILENO, "Error on creating message queue", 32);
         exit(1);
     }
 }
@@ -309,21 +309,21 @@ void sendMessage(int x, int y, int misses, int type) {
     msg.info.y = y;
     msg.info.misses = misses;
     if (msgsnd(messageQueueId, &msg, sizeof(CoordinatesAndMisses), 0) == -1) {
-        perror("Error on sending a message\n");
+        write(STDERR_FILENO, "Error on sending a message", 27);
         exit(1);
     }
 }
 
 void recieveMessage(Message *msg, int type) {
     if (msgrcv(messageQueueId, msg, sizeof(CoordinatesAndMisses), type, 0) == -1) {
-        perror("Error on recieving a message\n");
+        write(STDERR_FILENO, "Error on recieving a message", 29);
         exit(1);
     }
 }
 
 void deleteMessageQueue(int messageQueueId) {
     if (msgctl(messageQueueId, IPC_RMID, NULL) == -1) {
-        perror("Error on deleting message queue");
+        write(STDERR_FILENO, "Error on deleting message queue", 32);
         exit(1);
     }
 }
@@ -334,7 +334,7 @@ int awaitForClientSocket(int serverSocket) {
     clientAddress.sin_family = AF_INET;
     socklen_t clientAddressLength = sizeof(clientAddress);
     if ((clientSocket = accept(serverSocket, (AbstractSocketAddress*) &clientAddress, &clientAddressLength)) == -1) {
-        perror("Error occured on accepting upcoming connections");
+        write(STDERR_FILENO, "Error occured on accepting upcoming connections", 48);
         exit(1);
     }
 

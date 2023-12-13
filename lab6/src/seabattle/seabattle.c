@@ -178,14 +178,14 @@ int decypherCommand(char command[COMMAND_LENGTH], char arguments[ARGUMENTS_LENGT
     if (strcmp(battleCommand, "battle") == 0) {
         return decypherGameLevel(arguments, first);
     } else {
-        fprintf(stderr, "Unknown command\n");
+        write(STDERR_FILENO, "Unknown command\n", 17);
         return 1;
     }
 } 
 
 int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y) {
     if (sscanf(arguments, "(%d,%d)", x, y) != 2) {
-        fprintf(stderr, "Cannot recognize coordinates\n");
+        write(STDERR_FILENO, "Cannot recognize coordinates\n", 30);
         return 1;
     }
     return SHOT;
@@ -193,7 +193,7 @@ int decypherShot(char arguments[ARGUMENTS_LENGTH], int *x, int *y) {
 
 int decypherGameLevel(char arguments[ARGUMENTS_LENGTH], int *quantity) {
     if (sscanf(arguments, "{%d}", quantity) != 1) {
-        fprintf(stderr, "Cannot recognize quantity\n");
+        write(STDERR_FILENO, "Cannot recognize quantity\n", 27);
         return 1;
     }
     return NEW_BATTLE;
